@@ -18,6 +18,8 @@ Call `.set()` to set the anytype value. Call `.match<typename>(f)` to provide a 
 
 `set()` and `clear()` never throw. `match()` can only throw if you pass in a function that throws. `value()` throws a `std::runtime_exception` if you attempt to extract a different type from the one the anytype contains.
 
+anytype treats `char cont*` as `std::string` for convenience. To store a `char cont*`, explicity call `set<char const*>(my_c_string);`
+
 See this example:
 
 ```c++
