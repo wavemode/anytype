@@ -77,7 +77,7 @@ B is a copy of A: 20.8
 
 ## Caveats
 
-- anytype can not be directly constructed as a pointer, since passing a pointer to anytype's constructor means anytype is taking ownership of a heap object. To actually have anytype store a pointer, call `set` with an explicit pointer type, e.g.
+anytype can not be directly constructed as a pointer, since passing a pointer to anytype's constructor means anytype is taking ownership of a heap object. To actually have anytype store a pointer, call `set` with an explicit pointer type, e.g.
 
 ```c++
 anytype a;
