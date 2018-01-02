@@ -37,7 +37,7 @@ struct S {
 int main() {
 
     anytype a("This is a char const*, but anytype turns it into a std::string");
-    a.match<std::string>([](std::string const& v) {
+    a.match<std::string>([](std::string const&) {
         std::cout << "A is a std::string." << std::endl;
     });
     
