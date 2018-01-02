@@ -78,9 +78,10 @@ int main() {
     });
     
     
-    // delete the objects
+    /* redundant - clear() is automatically called when a and b go out of scope.
     a.clear();
     b.clear();
+    */
     
 }
 ```
