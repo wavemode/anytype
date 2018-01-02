@@ -74,6 +74,12 @@ int main() {
     b.match<float>([](float i) {
         std::cout << "B is a copy of A: " << i << std::endl;
     });
+    
+    
+    // delete the objects
+    a.clear();
+    b.clear();
+    
 }
 ```
 
