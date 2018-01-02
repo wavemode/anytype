@@ -1,18 +1,18 @@
 # anytype
 
-**What is anytype?**
+## What is anytype?
 
 anytype is a small, header-only C++11 library providing a dynamically-typed, memory-safe object wrapper.
 
-**Can't we already do this with dynamic_cast or boost::any?**
+## Can't we already do this with dynamic_cast or boost::any?
 
 Yes, but dynamic_cast is relatively slow and boost::any is a large dependency. anytype is a small and fast library with an extremely simple interface.
 
-**Does this library rely on undefined behavior?**
+## Does this library rely on undefined behavior?
 
 No. We do not delete void pointers or violate strict aliasing in any way.
 
-**How does it work?**
+## How does it work?
 
 Call `.set()` to set the anytype value. Call `.match<typename>(f)` to provide a function `f` that will be called if the anytype's current type is `<typename>`. Pass in a function that takes its argument by reference in order to modify the anytype value. `match` returns `*this` so calls can be chained. Call `.value<typename>()` to attempt to extract the value of the anytype.
 
@@ -75,7 +75,7 @@ Now, A is a float: 20.8
 B is a copy of A: 20.8
 ```
 
-**Caveats**
+## Caveats
 
 - anytype can not be directly constructed as a pointer, since passing a pointer to anytype's constructor means anytype is taking ownership of a heap object. To actually have anytype store a pointer, call `set` with an explicit pointer type, e.g.
 
@@ -84,7 +84,7 @@ anytype a;
 a.set<my_class*>(my_class_pointer);
 ```
 
-**LICENSE (MIT)**
+# LICENSE (MIT)
 
 Copyright &copy; 2017 Chukwudi Okechukwu
 
