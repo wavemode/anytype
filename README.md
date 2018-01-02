@@ -2,7 +2,7 @@
 
 **What is anytype?**
 
-anytype is a small, header-only C++ 11 library providing a dynamically-typed, memory-safe object wrapper.
+anytype is a small, header-only C++11 library providing a dynamically-typed, memory-safe object wrapper.
 
 **Can't we already do this with dynamic_cast or boost::any?**
 
