@@ -16,7 +16,7 @@ No. We do not delete void pointers or violate strict aliasing in any way.
 
 Call `.set()` to set the anytype value. Call `.match<typename>(f)` to provide a function `f` that will be called if the anytype's current type is `<typename>`. Pass in a function that takes its argument by reference in order to modify the anytype value. `match` returns `*this` so calls can be chained. Call `.value<typename>()` to attempt to extract the value of the anytype.
 
-`set` and `match` never throw. `value()` throws a `std::runtime_exception` if you attempt to extract a different type from the one the anytype contains.
+`set()` never throws. `match()` can only throw if you pass in a function that throws. `value()` throws a `std::runtime_exception` if you attempt to extract a different type from the one the anytype contains.
 
 See this example:
 
