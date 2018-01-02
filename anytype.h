@@ -11,15 +11,12 @@ public:
     anytype() noexcept {}
 
     ~anytype() noexcept {
-        if (type_id && ptr != nullptr) free(ptr);
+        clear();
     }
 
     anytype(char const* i) noexcept {
 
-        if (type_id && ptr != nullptr) {
-            free(ptr);
-            ptr = nullptr;
-        }
+        clear();
         std::string* p = new std::string(i);
         ptr = static_cast<void*>(p);
         type_id = get_type_id<std::string>();
@@ -35,10 +32,7 @@ public:
     template <typename T>
     anytype(T* p) noexcept {
 
-        if (type_id && ptr != nullptr) {
-            free(ptr);
-            ptr = nullptr;
-        }
+        clear();
         ptr = static_cast<void*>(p);
         type_id = get_type_id<T>();
         free = [](void* ptr) {
@@ -53,10 +47,7 @@ public:
     template <typename T>
     explicit anytype(T const& i) noexcept {
 
-        if (type_id && ptr != nullptr) {
-            free(ptr);
-            ptr = nullptr;
-        }
+        clear();
         T* p = new T(i);
         ptr = static_cast<void*>(p);
         type_id = get_type_id<T>();
@@ -70,10 +61,7 @@ public:
 
     anytype& operator=(anytype const& p) noexcept {
 
-        if (type_id && ptr != nullptr) {
-            free(ptr);
-            ptr = nullptr;
-        }
+        clear();
         free = p.free;
         copy = p.copy;
         type_id = p.type_id;
@@ -106,10 +94,7 @@ public:
     template <typename T>
     void set(T const& i) noexcept {
 
-        if (type_id && ptr != nullptr) {
-            free(ptr);
-            ptr = nullptr;
-        }
+        clear();
         T* p = new T(i);
         ptr = static_cast<void*>(p);
         type_id = get_type_id<T>();
@@ -124,10 +109,7 @@ public:
 
     void set(char const* i) noexcept {
 
-        if (type_id && ptr != nullptr) {
-            free(ptr);
-            ptr = nullptr;
-        }
+        clear();
         std::string* p = new std::string(i);
         ptr = static_cast<void*>(p);
         type_id = get_type_id<std::string>();
@@ -143,10 +125,7 @@ public:
     template <typename T>
     void set(T* p) noexcept {
 
-        if (type_id && ptr != nullptr) {
-            free(ptr);
-            ptr = nullptr;
-        }
+        clear();
         ptr = static_cast<void*>(const_cast<T*>(p));
         type_id = get_type_id<T>();
         free = [](void* ptr) {
@@ -197,10 +176,7 @@ private:
 template <>
 anytype::anytype<anytype>(anytype const& p) noexcept {
 
-    if (type_id && ptr != nullptr) {
-        free(ptr);
-        ptr = nullptr;
-    }
+    clear();
     free = p.free;
     copy = p.copy;
     type_id = p.type_id;
