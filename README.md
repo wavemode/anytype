@@ -38,6 +38,12 @@ int main() {
     a.match<std::string>([](std::string const& v) {
         std::cout << "A is a std::string." << std::endl;
     });
+    
+    /* equivalent:
+    if (a.match<std::string>()) {
+        std::cout << "A is a std::string." << std::endl;
+    }
+    */
 
     a.set(new S());
     a.set(15.8); // ~S() is called
