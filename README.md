@@ -63,6 +63,12 @@ int main() {
     a.match<float>([](float i) {
         std::cout << "Now, A is a float: " << i << std::endl;
     });
+    
+    /* equivalent:
+    if (a.match<float>()) {
+        std::cout << "Now, A is a float: " << a.value<float>() << std::endl;
+    }
+    */
 
     anytype b = a;
     b.match<float>([](float i) {
