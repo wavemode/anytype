@@ -83,7 +83,7 @@ public:
     }
 
     template <typename T, typename callable>
-    anytype& match(callable const& func) noexcept {
+    anytype& match(callable const& func) {
 
         if (type_id == get_type_id<T>()) {
 
