@@ -11,13 +11,36 @@ public:
     anytype() noexcept {}
 
     ~anytype() noexcept {
-        free(ptr);
+        if (type_id && ptr != nullptr) free(ptr);
+    }
+
+    anytype(char const* i) noexcept {
+
+        if (type_id && ptr != nullptr) {
+            free(ptr);
+            ptr = nullptr;
+        }
+        std::string* p = new std::string(i);
+        ptr = static_cast<void*>(p);
+        type_id = get_type_id<std::string>();
+        free = [](void* ptr) {
+             delete static_cast<std::string*>(ptr);
+        };
+        copy = [](void* ptr) -> void* {
+            return static_cast<void*>(new std::string(*static_cast<std::string*>(ptr)));
+        };
+
     }
 
     template <typename T>
-    anytype(T const* p) noexcept {
-        ptr = static_cast<void*>(const_cast<T*>(p));
-        type_id = get_type_id(p);
+    anytype(T* p) noexcept {
+
+        if (type_id && ptr != nullptr) {
+            free(ptr);
+            ptr = nullptr;
+        }
+        ptr = static_cast<void*>(p);
+        type_id = get_type_id<T>();
         free = [](void* ptr) {
             delete static_cast<T*>(ptr);
         };
@@ -28,10 +51,15 @@ public:
 
 
     template <typename T>
-    anytype(T const& i) noexcept {
+    explicit anytype(T const& i) noexcept {
+
+        if (type_id && ptr != nullptr) {
+            free(ptr);
+            ptr = nullptr;
+        }
         T* p = new T(i);
         ptr = static_cast<void*>(p);
-        type_id = get_type_id(p);
+        type_id = get_type_id<T>();
         free = [](void* ptr) {
             delete static_cast<T*>(ptr);
         };
@@ -42,10 +70,14 @@ public:
 
     anytype& operator=(anytype const& p) noexcept {
 
+        if (type_id && ptr != nullptr) {
+            free(ptr);
+            ptr = nullptr;
+        }
         free = p.free;
         copy = p.copy;
         type_id = p.type_id;
-        ptr = p.copy(p.ptr);
+        if (p.type_id) ptr = p.copy(p.ptr);
         return *this;
 
     }
@@ -74,9 +106,13 @@ public:
     template <typename T>
     void set(T const& i) noexcept {
 
+        if (type_id && ptr != nullptr) {
+            free(ptr);
+            ptr = nullptr;
+        }
         T* p = new T(i);
         ptr = static_cast<void*>(p);
-        type_id = get_type_id(p);
+        type_id = get_type_id<T>();
         free = [](void* ptr) {
             delete static_cast<T*>(ptr);
         };
@@ -86,9 +122,31 @@ public:
 
     }
 
-    template <typename T>
-    void set(T const* p) noexcept {
+    void set(char const* i) noexcept {
 
+        if (type_id && ptr != nullptr) {
+            free(ptr);
+            ptr = nullptr;
+        }
+        std::string* p = new std::string(i);
+        ptr = static_cast<void*>(p);
+        type_id = get_type_id<std::string>();
+        free = [](void* ptr) {
+            delete static_cast<std::string*>(ptr);
+        };
+        copy = [](void* ptr) -> void* {
+            return static_cast<void*>(new std::string(*static_cast<std::string*>(ptr)));
+        };
+
+    }
+
+    template <typename T>
+    void set(T* p) noexcept {
+
+        if (type_id && ptr != nullptr) {
+            free(ptr);
+            ptr = nullptr;
+        }
         ptr = static_cast<void*>(const_cast<T*>(p));
         type_id = get_type_id<T>();
         free = [](void* ptr) {
@@ -105,24 +163,29 @@ public:
         if (type_id == get_type_id<T>()) {
             return *static_cast<T*>(ptr);
         } else {
-            throw std::runtime_error("Invalid anytype value");
+            throw std::runtime_error("Invalid anytype value.");
         }
     }
 
-    template <typename T>
-    T cast() const noexcept {
-        return T(*static_cast<T*>(ptr));
+    void clear() noexcept {
+
+        if (type_id && ptr != nullptr) {
+            free(ptr);
+            ptr = nullptr;
+        }
+        type_id = 0;
+
     }
 
 private:
 
-    int type_id;
+    int type_id = 0;
     void* ptr;
     void (*free)(void*);
     void* (*copy)(void*);
 
     template <typename T>
-    static int get_type_id(T* value = nullptr) {
+    static int get_type_id() {
 
         static char id;
         return reinterpret_cast<int>(&id);
@@ -134,40 +197,14 @@ private:
 template <>
 anytype::anytype<anytype>(anytype const& p) noexcept {
 
+    if (type_id && ptr != nullptr) {
+        free(ptr);
+        ptr = nullptr;
+    }
     free = p.free;
     copy = p.copy;
     type_id = p.type_id;
-    ptr = p.copy(p.ptr);
-
-}
-
-template <>
-anytype::anytype<char>(char const* i) noexcept {
-
-    std::string* p = new std::string(i);
-    ptr = static_cast<void*>(p);
-    type_id = get_type_id(p);
-    free = [](void* ptr) {
-        delete static_cast<std::string*>(ptr);
-    };
-    copy = [](void* ptr) -> void* {
-        return static_cast<void*>(new std::string(*static_cast<std::string*>(ptr)));
-    };
-
-}
-
-template<>
-void anytype::set<char>(char const* i) noexcept {
-
-    std::string* p = new std::string(i);
-    ptr = static_cast<void*>(p);
-    type_id = get_type_id(p);
-    free = [](void* ptr) {
-        delete static_cast<std::string*>(ptr);
-    };
-    copy = [](void* ptr) -> void* {
-        return static_cast<void*>(new std::string(*static_cast<std::string*>(ptr)));
-    };
+    if (p.type_id) ptr = p.copy(p.ptr);
 
 }
 
