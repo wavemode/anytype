@@ -166,8 +166,10 @@ private:
     template <typename T>
     static int get_type_id() {
 
-        static char id;
-        return reinterpret_cast<int>(&id);
+        static const char id = 0;
+        static const int addr = reinterpret_cast<int>(&id);
+        
+        return addr;
 
     }
 
