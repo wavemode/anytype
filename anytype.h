@@ -126,7 +126,7 @@ public:
     void set(T* p) noexcept {
 
         clear();
-        ptr = static_cast<void*>(const_cast<T*>(p));
+        ptr = static_cast<void*>(p);
         type_id = get_type_id<T>();
         free = [](void* ptr) {
             delete static_cast<T*>(ptr);
