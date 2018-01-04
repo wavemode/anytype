@@ -20,7 +20,7 @@ public:
         clear();
         std::string* p = new std::string(i);
         ptr = static_cast<void*>(p);
-        type_id = typeid(std::string).hash_code();;
+        type_id = get_type_id<std::string>();
         free = [](void* ptr) {
              delete static_cast<std::string*>(ptr);
         };
@@ -35,7 +35,7 @@ public:
 
         clear();
         ptr = static_cast<void*>(p);
-        type_id = typeid(T).hash_code();
+        type_id = get_type_id<T>();
         free = [](void* ptr) {
             delete static_cast<T*>(ptr);
         };
@@ -51,7 +51,7 @@ public:
         clear();
         T* p = new T(i);
         ptr = static_cast<void*>(p);
-        type_id = typeid(T).hash_code();
+        type_id = get_type_id<T>();
         free = [](void* ptr) {
             delete static_cast<T*>(ptr);
         };
@@ -74,7 +74,7 @@ public:
     template <typename T, typename callable>
     anytype& match(callable const& func) {
 
-        if (type_id == typeid(T).hash_code()) {
+        if (type_id == get_type_id<T>()) {
 
             func(*static_cast<T*>(ptr));
 
@@ -88,7 +88,7 @@ public:
     template <typename T>
     bool match() noexcept {
 
-        return type_id == typeid(T).hash_code();
+        return type_id == get_type_id<T>();
 
     }
 
@@ -98,7 +98,7 @@ public:
         clear();
         T* p = new T(i);
         ptr = static_cast<void*>(p);
-        type_id = typeid(T).hash_code();
+        type_id = get_type_id<T>();
         free = [](void* ptr) {
             delete static_cast<T*>(ptr);
         };
@@ -113,7 +113,7 @@ public:
         clear();
         std::string* p = new std::string(i);
         ptr = static_cast<void*>(p);
-        type_id = typeid(std::string).hash_code();;
+        type_id = get_type_id<std::string>();
         free = [](void* ptr) {
             delete static_cast<std::string*>(ptr);
         };
@@ -128,7 +128,7 @@ public:
 
         clear();
         ptr = static_cast<void*>(p);
-        type_id = typeid(T).hash_code();
+        type_id = get_type_id<T>();
         free = [](void* ptr) {
             delete static_cast<T*>(ptr);
         };
@@ -140,7 +140,7 @@ public:
 
     template <typename T>
     T& value() const {
-        if (type_id == typeid(T).hash_code()) {
+        if (type_id == get_type_id<T>()) {
             return *static_cast<T*>(ptr);
         } else {
             throw std::runtime_error("Invalid anytype value.");
@@ -163,6 +163,13 @@ private:
     void* ptr;
     void (*free)(void*);
     void* (*copy)(void*);
+
+    template <typename T>
+    static constexpr size_t get_type_id() {
+
+        return typeid(T).hash_code();
+
+    }
 
 };
 
