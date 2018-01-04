@@ -2,7 +2,6 @@
 #define ANYTYPE_H
 
 #include <stdexcept>
-#include <typeinfo>
 #include <string>
 
 class anytype {
@@ -159,15 +158,18 @@ public:
 
 private:
 
-    size_t type_id = 0;
+    int type_id = 0;
     void* ptr;
     void (*free)(void*);
     void* (*copy)(void*);
 
     template <typename T>
-    static constexpr size_t get_type_id() {
+    static int get_type_id() {
 
-        return typeid(T).hash_code();
+        static const char id = 0;
+        static const int addr = reinterpret_cast<int>(&id);
+        
+        return addr;
 
     }
 
