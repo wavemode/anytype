@@ -6,7 +6,7 @@ anytype is a small, header-only C++11 library providing a dynamically-typed, mem
 
 ## Can't we already do this with dynamic_cast or boost::any?
 
-Yes, but dynamic_cast is extremely slow and boost::any is a huge dependency. anytype is a small and fast library with an extremely simple interface. anytype has hardly more overhead than a regular heap-allocated object.
+Yes, but dynamic_cast is relatively slow and boost::any is a huge dependency. anytype is a small and fast library with an extremely simple interface. anytype has hardly more overhead than a regular heap-allocated object.
 
 ## Does this library rely on undefined behavior?
 
