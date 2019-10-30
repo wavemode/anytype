@@ -45,8 +45,8 @@ int main() {
     }
     */
 
-    a.set(new S());
-    a.set(15.8); // ~S() is called
+    a = new S();
+    a = 15.8; // ~S() is called
 
     a.match<float>([](float i) {
         // This will not execute
