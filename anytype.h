@@ -69,22 +69,6 @@ public:
 		};
 	}
 
-	template <typename T, typename... Args>
-	void construct(Args... args) {
-
-		clear();
-		T* p = new T(args...);
-		ptr = static_cast<void*>(p);
-		type_id = get_type_id<T>();
-		free = [](void* ptr) {
-			delete static_cast<T*>(ptr);
-		};
-		copy = [](void* ptr) -> void* {
-			return static_cast<void*>(new T(*static_cast<T*>(ptr)));
-		};
-
-	}
-
 	anytype& operator=(anytype const& p) {
 
 		clear();
