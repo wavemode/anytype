@@ -8,13 +8,13 @@ class anytype {
 
 public:
 
-	anytype() noexcept {}
+	anytype() {}
 
-	~anytype() noexcept {
+	~anytype() {
 		clear();
 	}
 
-	anytype(anytype const& p) noexcept {
+	anytype(anytype const& p) {
 
 		clear();
 		free = p.free;
@@ -24,7 +24,7 @@ public:
 
 	}
 
-	anytype(char const* i) noexcept {
+	anytype(char const* i) {
 
 		clear();
 		std::string* p = new std::string(i);
@@ -40,7 +40,7 @@ public:
 	}
 
 	template <typename T>
-	anytype(T* p) noexcept {
+	anytype(T* p) {
 
 		clear();
 		ptr = static_cast<void*>(p);
@@ -55,7 +55,7 @@ public:
 
 
 	template <typename T>
-	explicit anytype(T const& i) noexcept {
+	explicit anytype(T const& i) {
 
 		clear();
 		T* p = new T(i);
@@ -69,7 +69,23 @@ public:
 		};
 	}
 
-	anytype& operator=(anytype const& p) noexcept {
+	template <typename T, typename... Args>
+	void construct(Args... args) {
+
+		clear();
+		T* p = new T(args...);
+		ptr = static_cast<void*>(p);
+		type_id = get_type_id<T>();
+		free = [](void* ptr) {
+			delete static_cast<T*>(ptr);
+		};
+		copy = [](void* ptr) -> void* {
+			return static_cast<void*>(new T(*static_cast<T*>(ptr)));
+		};
+
+	}
+
+	anytype& operator=(anytype const& p) {
 
 		clear();
 		free = p.free;
@@ -80,8 +96,14 @@ public:
 
 	}
 
-	template <typename T, typename callable>
-	anytype& match(callable const& func) {
+	template <typename T>
+	anytype& operator=(T const& p) {
+		set(p);
+		return *this;
+	}
+
+	template <typename T, typename Callable>
+	anytype& match(Callable const& func) {
 
 		if (type_id == get_type_id<T>()) {
 
@@ -95,14 +117,14 @@ public:
 
 
 	template <typename T>
-	bool match() noexcept {
+	bool match() {
 
 		return type_id == get_type_id<T>();
 
 	}
 
 	template <typename T>
-	void set(T const& i) noexcept {
+	void set(T const& i) {
 
 		clear();
 		T* p = new T(i);
@@ -117,7 +139,7 @@ public:
 
 	}
 
-	void set(char const* i) noexcept {
+	void set(char const* i) {
 
 		clear();
 		std::string* p = new std::string(i);
@@ -133,7 +155,7 @@ public:
 	}
 
 	template <typename T>
-	void set(T* p) noexcept {
+	void set(T* p) {
 
 		clear();
 		ptr = static_cast<void*>(p);
@@ -156,7 +178,7 @@ public:
 		}
 	}
 
-	void clear() noexcept {
+	void clear() {
 
 		if (type_id && ptr != nullptr) {
 			free(ptr);
