@@ -8,183 +8,183 @@ class anytype {
 
 public:
 
-    anytype() noexcept {}
+	anytype() noexcept {}
 
-    ~anytype() noexcept {
-        clear();
-    }
+	~anytype() noexcept {
+		clear();
+	}
 
-    anytype(char const* i) noexcept {
+	anytype(anytype const& p) noexcept {
 
-        clear();
-        std::string* p = new std::string(i);
-        ptr = static_cast<void*>(p);
-        type_id = get_type_id<std::string>();
-        free = [](void* ptr) {
-             delete static_cast<std::string*>(ptr);
-        };
-        copy = [](void* ptr) -> void* {
-            return static_cast<void*>(new std::string(*static_cast<std::string*>(ptr)));
-        };
+		clear();
+		free = p.free;
+		copy = p.copy;
+		type_id = p.type_id;
+		if (p.type_id) ptr = p.copy(p.ptr);
 
-    }
+	}
 
-    template <typename T>
-    anytype(T* p) noexcept {
+	anytype(char const* i) noexcept {
 
-        clear();
-        ptr = static_cast<void*>(p);
-        type_id = get_type_id<T>();
-        free = [](void* ptr) {
-            delete static_cast<T*>(ptr);
-        };
-        copy = [](void* ptr) -> void* {
-            return static_cast<void*>(new T(*static_cast<T*>(ptr)));
-        };
-    }
+		clear();
+		std::string* p = new std::string(i);
+		ptr = static_cast<void*>(p);
+		type_id = get_type_id<std::string>();
+		free = [](void* ptr) {
+			delete static_cast<std::string*>(ptr);
+		};
+		copy = [](void* ptr) -> void* {
+			return static_cast<void*>(new std::string(*static_cast<std::string*>(ptr)));
+		};
 
+	}
 
-    template <typename T>
-    explicit anytype(T const& i) noexcept {
+	template <typename T>
+	anytype(T* p) noexcept {
 
-        clear();
-        T* p = new T(i);
-        ptr = static_cast<void*>(p);
-        type_id = get_type_id<T>();
-        free = [](void* ptr) {
-            delete static_cast<T*>(ptr);
-        };
-        copy = [](void* ptr) -> void* {
-            return static_cast<void*>(new T(*static_cast<T*>(ptr)));
-        };
-    }
-
-    anytype& operator=(anytype const& p) noexcept {
-
-        clear();
-        free = p.free;
-        copy = p.copy;
-        type_id = p.type_id;
-        if (p.type_id) ptr = p.copy(p.ptr);
-        return *this;
-
-    }
-
-    template <typename T, typename callable>
-    anytype& match(callable const& func) {
-
-        if (type_id == get_type_id<T>()) {
-
-            func(*static_cast<T*>(ptr));
-
-        }
-
-        return *this;
-
-    }
+		clear();
+		ptr = static_cast<void*>(p);
+		type_id = get_type_id<T>();
+		free = [](void* ptr) {
+			delete static_cast<T*>(ptr);
+		};
+		copy = [](void* ptr) -> void* {
+			return static_cast<void*>(new T(*static_cast<T*>(ptr)));
+		};
+	}
 
 
-    template <typename T>
-    bool match() noexcept {
+	template <typename T>
+	explicit anytype(T const& i) noexcept {
 
-        return type_id == get_type_id<T>();
+		clear();
+		T* p = new T(i);
+		ptr = static_cast<void*>(p);
+		type_id = get_type_id<T>();
+		free = [](void* ptr) {
+			delete static_cast<T*>(ptr);
+		};
+		copy = [](void* ptr) -> void* {
+			return static_cast<void*>(new T(*static_cast<T*>(ptr)));
+		};
+	}
 
-    }
+	anytype& operator=(anytype const& p) noexcept {
 
-    template <typename T>
-    void set(T const& i) noexcept {
+		clear();
+		free = p.free;
+		copy = p.copy;
+		type_id = p.type_id;
+		if (p.type_id) ptr = p.copy(p.ptr);
+		return *this;
 
-        clear();
-        T* p = new T(i);
-        ptr = static_cast<void*>(p);
-        type_id = get_type_id<T>();
-        free = [](void* ptr) {
-            delete static_cast<T*>(ptr);
-        };
-        copy = [](void* ptr) -> void* {
-            return static_cast<void*>(new T(*static_cast<T*>(ptr)));
-        };
+	}
 
-    }
+	template <typename T, typename callable>
+	anytype& match(callable const& func) {
 
-    void set(char const* i) noexcept {
+		if (type_id == get_type_id<T>()) {
 
-        clear();
-        std::string* p = new std::string(i);
-        ptr = static_cast<void*>(p);
-        type_id = get_type_id<std::string>();
-        free = [](void* ptr) {
-            delete static_cast<std::string*>(ptr);
-        };
-        copy = [](void* ptr) -> void* {
-            return static_cast<void*>(new std::string(*static_cast<std::string*>(ptr)));
-        };
+			func(*static_cast<T*>(ptr));
 
-    }
+		}
 
-    template <typename T>
-    void set(T* p) noexcept {
+		return *this;
 
-        clear();
-        ptr = static_cast<void*>(p);
-        type_id = get_type_id<T>();
-        free = [](void* ptr) {
-            delete static_cast<T*>(ptr);
-        };
-        copy = [](void* ptr) -> void* {
-            return static_cast<void*>(new T(*static_cast<T*>(ptr)));
-        };
+	}
 
-    }
 
-    template <typename T>
-    T& value() const {
-        if (type_id == get_type_id<T>()) {
-            return *static_cast<T*>(ptr);
-        } else {
-            throw std::runtime_error("Invalid anytype value.");
-        }
-    }
+	template <typename T>
+	bool match() noexcept {
 
-    void clear() noexcept {
+		return type_id == get_type_id<T>();
 
-        if (type_id && ptr != nullptr) {
-            free(ptr);
-            ptr = nullptr;
-        }
-        type_id = 0;
+	}
 
-    }
+	template <typename T>
+	void set(T const& i) noexcept {
+
+		clear();
+		T* p = new T(i);
+		ptr = static_cast<void*>(p);
+		type_id = get_type_id<T>();
+		free = [](void* ptr) {
+			delete static_cast<T*>(ptr);
+		};
+		copy = [](void* ptr) -> void* {
+			return static_cast<void*>(new T(*static_cast<T*>(ptr)));
+		};
+
+	}
+
+	void set(char const* i) noexcept {
+
+		clear();
+		std::string* p = new std::string(i);
+		ptr = static_cast<void*>(p);
+		type_id = get_type_id<std::string>();
+		free = [](void* ptr) {
+			delete static_cast<std::string*>(ptr);
+		};
+		copy = [](void* ptr) -> void* {
+			return static_cast<void*>(new std::string(*static_cast<std::string*>(ptr)));
+		};
+
+	}
+
+	template <typename T>
+	void set(T* p) noexcept {
+
+		clear();
+		ptr = static_cast<void*>(p);
+		type_id = get_type_id<T>();
+		free = [](void* ptr) {
+			delete static_cast<T*>(ptr);
+		};
+		copy = [](void* ptr) -> void* {
+			return static_cast<void*>(new T(*static_cast<T*>(ptr)));
+		};
+
+	}
+
+	template <typename T>
+	T& value() const {
+		if (type_id == get_type_id<T>()) {
+			return *static_cast<T*>(ptr);
+		} else {
+			throw std::runtime_error("Invalid anytype value.");
+		}
+	}
+
+	void clear() noexcept {
+
+		if (type_id && ptr != nullptr) {
+			free(ptr);
+			ptr = nullptr;
+		}
+		type_id = 0;
+
+	}
 
 private:
 
-    int type_id = 0;
-    void* ptr;
-    void (*free)(void*);
-    void* (*copy)(void*);
+	int type_id = 0;
+	void* ptr;
+	void(*free)(void*);
+	void* (*copy)(void*);
 
-    template <typename T>
-    static int get_type_id() {
+	template <typename T>
+	static int get_type_id() {
 
-        static const char id = 0;
-        static const int addr = reinterpret_cast<int>(&id);
-        
-        return addr;
+		static const char id = 0;
+		static const int addr = reinterpret_cast<int>(&id);
 
-    }
+		return addr;
+
+	}
 
 };
 
-template <>
-anytype::anytype<anytype>(anytype const& p) noexcept {
-
-    clear();
-    free = p.free;
-    copy = p.copy;
-    type_id = p.type_id;
-    if (p.type_id) ptr = p.copy(p.ptr);
-
-}
 
 
 #endif // ANYTYPE_H
