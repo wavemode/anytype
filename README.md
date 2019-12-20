@@ -34,52 +34,58 @@ struct S {
 
 int main() {
 
-    anytype a("This is a char const*, but anytype turns it into a std::string");
-    a.match<std::string>([](std::string const&) {
-        std::cout << "A is a std::string." << std::endl;
-    });
-    
-    /* equivalent:
-    if (a.match<std::string>()) {
-        std::cout << "A is a std::string." << std::endl;
-    }
-    */
+	anytype a = "This is a char const*, but anytype turns it into a std::string";
+	a.match<std::string>([](std::string const&) {
+		std::cout << "A is a std::string." << std::endl;
+	});
 
-    a = new S();
-    a = 15.8; // ~S() is called
+	/* equivalent:
+	if (a.match<std::string>()) {
+		std::cout << "A is a std::string." << std::endl;
+	}
+	*/
 
-    a.match<float>([](float i) {
-        // This will not execute
-        std::cout << "A is not a float: " << i << std::endl;
-    }).match<double>([](double& i) {
-        std::cout << "A is a double: " << i << std::endl;
-        i += 5;
-    });
+	a = new S();
+	a = 10; // ~S() is called
+	a = 'A';
+	a = "a string";
+	a = 15.8;
 
-    a.value<double>(); // 20.8
+	a.match<float>([](float i) {
+		// This will not execute
+		std::cout << "A is not a float: " << i << std::endl;
+	}).match<double>([](double& i) {
+		// This will execute
+		std::cout << "A is a double: " << i << std::endl;
+		i += 5;
+	});
 
-    a.set<float>(a.value<double>()); // equivalent: a.set(20.8f);
+	a.value<double>(); // 20.8
 
-    a.match<float>([](float i) {
-        std::cout << "Now, A is a float: " << i << std::endl;
-    });
-    
-    /* equivalent:
-    if (a.match<float>()) {
-        std::cout << "Now, A is a float: " << a.value<float>() << std::endl;
-    }
-    */
+	a.set<float>(a.value<double>()); // equivalent: a.set(20.8f);
 
-    anytype b = a;
-    b.match<float>([](float i) {
-        std::cout << "B is a copy of A: " << i << std::endl;
-    });
-    
-    
-    /* redundant - clear() is automatically called when a and b go out of scope.
-    a.clear();
-    b.clear();
-    */
+	a.match<float>([](float i) {
+		std::cout << "Now, A is a float: " << i << std::endl;
+	});
+
+	/* equivalent:
+	if (a.match<float>()) {
+		std::cout << "Now, A is a float: " << a.value<float>() << std::endl;
+	}
+	*/
+
+	anytype b = a;
+	b.match<float>([](float i) {
+		std::cout << "B is a copy of A: " << i << std::endl;
+	});
+
+	/* redundant - clear() is automatically called when a and b go out of scope.
+	a.clear();
+	b.clear();
+	*/
+
+	std::cin.get();
+	return 0;
     
 }
 ```
