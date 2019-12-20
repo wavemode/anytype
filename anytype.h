@@ -157,7 +157,8 @@ public:
 	T& value() const {
 		if (type_id == get_type_id<T>()) {
 			return *static_cast<T*>(ptr);
-		} else {
+		}
+		else {
 			throw std::runtime_error("Invalid anytype value.");
 		}
 	}
@@ -174,18 +175,17 @@ public:
 
 private:
 
-	int type_id = 0;
+	long long int type_id = 0;
 	void* ptr;
 	void(*free)(void*);
 	void* (*copy)(void*);
 
 	template <typename T>
-	static int get_type_id() {
+	static long long int get_type_id() {
 
-		static const char id = 0;
-		static const int addr = reinterpret_cast<int>(&id);
+		static const char addr;
 
-		return addr;
+		return reinterpret_cast<long long int>(&addr);
 
 	}
 
