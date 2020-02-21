@@ -172,6 +172,10 @@ public:
 		type_id = 0;
 
 	}
+	
+	bool null() {
+		return !type_id;
+	}
 
 private:
 
